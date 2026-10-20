@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Flowboard{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">Workspace</span><h1>Your dashboard</h1></div><a class="button" href="{% url 'project_create' %}">New project</a></div>
+<section><h2>Projects</h2><div class="card-grid">
+{% for project in projects %}<a class="project-card" href="{% url 'project_detail' project.pk %}"><span class="dot"></span><h3>{{ project.name }}</h3><p>{{ project.description|default:"No description yet."|truncatewords:18 }}</p><small>{{ project.members.count }} member{{ project.members.count|pluralize }}</small></a>
+{% empty %}<div class="empty-state"><h3>No projects yet</h3><p>Create your first project and Flowboard will prepare its task board.</p></div>{% endfor %}
+</div></section>
+<section><h2>Assigned to you</h2><div class="task-list">{% for task in assigned_tasks %}<a href="{% url 'task_detail' task.pk %}"><b>{{ task.title }}</b><span>{{ task.board.project.name }} · {{ task.board.name }}</span></a>{% empty %}<p class="muted">Nothing assigned yet.</p>{% endfor %}</div></section>
+{% endblock %}

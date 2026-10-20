@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+    <div>
+        <span class="eyebrow">Plan together. Deliver clearly.</span>
+        <h1>Turn team plans into visible progress.</h1>
+        <p>Flowboard keeps projects, tasks, owners, deadlines, and conversations in one focused workspace.</p>
+        <a class="button" href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'register' %}{% endif %}">Open your workspace</a>
+    </div>
+    <div class="hero-card">
+        <div class="mini-column"><b>To Do</b><span>Research audience</span><span>Draft wireframes</span></div>
+        <div class="mini-column"><b>In Progress</b><span>Build landing page</span></div>
+        <div class="mini-column"><b>Done</b><span>Project brief</span></div>
+    </div>
+</section>
+{% endblock %}

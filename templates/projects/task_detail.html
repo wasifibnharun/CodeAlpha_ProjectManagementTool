@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}{{ task.title }} | Flowboard{% endblock %}
+{% block content %}
+<a class="back-link" href="{% url 'project_detail' task.board.project.pk %}">← {{ task.board.project.name }}</a>
+<div class="detail-grid"><article class="panel"><span class="eyebrow">{{ task.board.name }}</span><h1>{{ task.title }}</h1><p>{{ task.description|default:"No description provided." }}</p><dl><dt>Priority</dt><dd>{{ task.get_priority_display }}</dd><dt>Assignee</dt><dd>{{ task.assignee|default:"Unassigned" }}</dd><dt>Due</dt><dd>{{ task.due_date|default:"No due date" }}</dd></dl></article>
+<aside class="panel"><h2>Conversation</h2><div class="comments">{% for comment in task.comments.all %}<div><b>{{ comment.author.username }}</b><small>{{ comment.created_at|timesince }} ago</small><p>{{ comment.body }}</p></div>{% empty %}<p class="muted">No comments yet.</p>{% endfor %}</div><form method="post">{% csrf_token %}{{ form.as_p }}<button class="button" type="submit">Post comment</button></form></aside></div>
+{% endblock %}
