@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Comment, Project, Task
+from .models import Board, Comment, Project, Task
 
 
 class RegistrationForm(UserCreationForm):
@@ -39,3 +39,17 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ("body",)
         widgets = {"body": forms.Textarea(attrs={"rows": 2, "placeholder": "Write a comment..."})}
+
+
+class MemberForm(forms.Form):
+    username_or_email = forms.CharField(
+        max_length=254,
+        label="Username or email",
+        help_text="The person must already have a Flowboard account.",
+    )
+
+
+class BoardForm(forms.ModelForm):
+    class Meta:
+        model = Board
+        fields = ("name",)

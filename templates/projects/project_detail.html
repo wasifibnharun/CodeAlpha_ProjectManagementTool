@@ -1,10 +1,24 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}{{ project.name }} | Flowboard{% endblock %}
 {% block content %}
-<div class="page-heading"><div><a class="back-link" href="{% url 'dashboard' %}">← Dashboard</a><h1>{{ project.name }}</h1><p>{{ project.description }}</p></div><div class="member-stack">{% for member in project.members.all %}<span title="{{ member.username }}">{{ member.username|first|upper }}</span>{% endfor %}</div></div>
-<div class="board">
-{% for column in project.boards.all %}<section class="board-column"><div class="column-heading"><h2>{{ column.name }}</h2><a href="{% url 'task_create' project.pk column.pk %}" aria-label="Add task">+</a></div>
-{% for task in column.tasks.all %}<a class="task-card priority-{{ task.priority }}" href="{% url 'task_detail' task.pk %}"><b>{{ task.title }}</b>{% if task.description %}<p>{{ task.description|truncatewords:14 }}</p>{% endif %}<div><span class="priority">{{ task.get_priority_display }}</span>{% if task.assignee %}<span class="avatar">{{ task.assignee.username|first|upper }}</span>{% endif %}</div></a>
-{% empty %}<p class="column-empty">No tasks here.</p>{% endfor %}</section>{% endfor %}
+<div class="page-heading project-heading">
+    <div><a class="back-link" href="{% url 'dashboard' %}">← Dashboard</a><h1>{{ project.name }}</h1><p>{{ project.description|default:"No project description." }}</p></div>
+    <div class="project-actions"><div class="member-stack">{% for member in project.members.all %}<span title="{{ member.username }}">{{ member.username|first|upper }}</span>{% endfor %}</div>{% if is_owner %}<a class="button secondary" href="{% url 'members_manage' project.pk %}">Team</a><a class="button secondary" href="{% url 'project_update' project.pk %}">Settings</a><a class="button" href="{% url 'board_create' project.pk %}">Add board</a><a class="owner-delete" href="{% url 'project_delete' project.pk %}">Delete</a>{% endif %}</div>
 </div>
+<div class="board" data-board-root>
+{% for column in project.boards.all %}
+<section class="board-column" data-board-id="{{ column.pk }}">
+    <div class="column-heading"><h2>{{ column.name }} <small>{{ column.tasks.count }}</small></h2><div><a href="{% url 'task_create' project.pk column.pk %}" aria-label="Add task">+</a>{% if is_owner %}<a href="{% url 'board_update' column.pk %}" aria-label="Rename board">···</a>{% endif %}</div></div>
+    <div class="task-dropzone">
+    {% for task in column.tasks.all %}<a class="task-card priority-{{ task.priority }}" draggable="true" data-task-id="{{ task.pk }}" data-move-url="{% url 'task_move' task.pk %}" href="{% url 'task_detail' task.pk %}"><b>{{ task.title }}</b>{% if task.description %}<p>{{ task.description|truncatewords:14 }}</p>{% endif %}<div><span class="priority">{{ task.get_priority_display }}{% if task.comments.count %} · {{ task.comments.count }} comment{{ task.comments.count|pluralize }}{% endif %}</span>{% if task.assignee %}<span class="avatar" title="{{ task.assignee.username }}">{{ task.assignee.username|first|upper }}</span>{% endif %}</div></a>
+    {% empty %}<p class="column-empty">Drop tasks here.</p>{% endfor %}
+    </div>
+    {% if is_owner %}<form class="inline-delete board-delete" method="post" action="{% url 'board_delete' column.pk %}" onsubmit="return confirm('Delete this empty board?')">{% csrf_token %}<button type="submit">Delete board</button></form>{% endif %}
+</section>
+{% endfor %}
+</div>
+<section class="activity-panel"><h2>Recent activity</h2><div class="activity-list">{% for item in project.activities.all|slice:":12" %}<div><span class="activity-avatar">{{ item.actor.username|default:"?"|first|upper }}</span><p><b>{{ item.actor.username|default:"Former member" }}</b> {{ item.message }}<small>{{ item.created_at|timesince }} ago</small></p></div>{% empty %}<p class="muted">No activity yet.</p>{% endfor %}</div></section>
+<form class="csrf-holder">{% csrf_token %}</form>
 {% endblock %}
+{% block scripts %}<script src="{% static 'js/board.js' %}"></script>{% endblock %}

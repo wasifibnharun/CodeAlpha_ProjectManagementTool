@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Notifications | Flowboard{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">Inbox</span><h1>Notifications</h1></div>{% if notifications %}<form method="post" action="{% url 'notifications_read_all' %}">{% csrf_token %}<button class="button secondary" type="submit">Mark all read</button></form>{% endif %}</div>
+<div class="notification-list">{% for notification in notifications %}<form method="post" action="{% url 'notification_open' notification.pk %}" class="notification-item {% if not notification.is_read %}unread{% endif %}">{% csrf_token %}<button type="submit"><span class="dot"></span><span><b>{{ notification.message }}</b><small>{{ notification.project.name }} · {{ notification.created_at|timesince }} ago</small></span></button></form>{% empty %}<div class="empty-state"><h3>All caught up</h3><p>Your assignments, comments, and project invitations will appear here.</p></div>{% endfor %}</div>
+{% endblock %}

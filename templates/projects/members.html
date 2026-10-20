@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Team | {{ project.name }}{% endblock %}
+{% block content %}
+<a class="back-link" href="{% url 'project_detail' project.pk %}">← {{ project.name }}</a>
+<div class="detail-grid"><section class="panel"><span class="eyebrow">Project access</span><h1>Team members</h1><div class="member-list">{% for membership in memberships %}<div><span class="avatar">{{ membership.user.username|first|upper }}</span><p><b>{{ membership.user.username }}</b><small>{{ membership.user.email|default:"No email" }} · {{ membership.get_role_display }}</small></p>{% if membership.role == "member" %}<form method="post" action="{% url 'member_remove' project.pk membership.user.pk %}" onsubmit="return confirm('Remove this member?')">{% csrf_token %}<button class="text-danger" type="submit">Remove</button></form>{% endif %}</div>{% endfor %}</div></section>
+<aside class="panel"><h2>Add a registered user</h2><p class="muted">Enter their exact username or email address.</p><form method="post">{% csrf_token %}{{ form.as_p }}<button class="button" type="submit">Add member</button></form></aside></div>
+{% endblock %}

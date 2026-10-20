@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Board, Comment, Project, ProjectMembership, Task
+from .models import Activity, Board, Comment, Notification, Project, ProjectMembership, Task
 
 
 class MembershipInline(admin.TabularInline):
@@ -24,3 +24,5 @@ class TaskAdmin(admin.ModelAdmin):
 
 admin.site.register(Board)
 admin.site.register(Comment)
+admin.site.register(Activity)
+admin.site.register(Notification)

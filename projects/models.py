@@ -88,3 +88,38 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.author} on {self.task}"
+
+
+class Activity(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="activities")
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="project_activities",
+    )
+    task = models.ForeignKey(Task, on_delete=models.SET_NULL, null=True, blank=True, related_name="activities")
+    message = models.CharField(max_length=240)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name_plural = "activities"
+
+    def __str__(self):
+        return self.message
+
+
+class Notification(models.Model):
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="notifications")
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, blank=True, related_name="notifications")
+    message = models.CharField(max_length=240)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.message
